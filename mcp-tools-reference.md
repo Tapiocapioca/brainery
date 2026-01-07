@@ -8,7 +8,7 @@ Complete reference for MCP tools used in Brainery workflows.
 |-----------|------|---------|-----------------|
 | **crawl4ai** | 9100 | Web page extraction | `mcp__crawl4ai__*` |
 | **yt-dlp-server** | 9101 | YouTube transcripts | `mcp__yt-dlp__*` |
-| **whisper-server** | 9102 | Audio transcription | HTTP API (curl) |
+| **whisper-server** | 9102 | Audio transcription | `mcp__tapiocapioca_whisper-mcp-server__*` |
 | **anythingllm** | 9103 | Local RAG database | `mcp__anythingllm__*` |
 | **unstructured-api** | 9104 | Document parsing | `mcp__tapiocapioca_unstructured-mcp-server__*` |
 
@@ -349,6 +349,55 @@ mcp__tapiocapioca_unstructured-mcp-server__parse_batch
 ]
 ```
 
+
+## Whisper Tools (FastMCP)
+
+### transcribe_audio
+
+Transcribe audio files using Whisper.
+
+**Tool name:** `mcp__tapiocapioca_whisper-mcp-server__transcribe_audio`
+
+**Parameters:**
+- `file_path` (required): Absolute path to audio file
+- `language` (optional): Language code or "auto" (default: "auto")
+  - Examples: "en", "it", "zh", "auto"
+- `model` (optional): Whisper model size (default: "base")
+  - `tiny`: Fastest, lowest quality (~39M params)
+  - `base`: Good balance (default) (~74M params)
+  - `small`: Better quality (~244M params)
+  - `medium`: High quality (~769M params)
+  - `large`: Best quality (~1550M params)
+
+**Supported formats:**
+- MP3, M4A, WAV, OGG, FLAC, WEBM
+
+**Example:**
+```
+mcp__tapiocapioca_whisper-mcp-server__transcribe_audio
+  file_path: "C:/Users/Name/Downloads/audio.m4a"
+  language: "auto"
+  model: "base"
+```
+
+**Returns JSON:**
+```json
+{
+  "text": "Transcribed text content...",
+  "language": "en",
+  "duration": 125.5,
+  "segments": 42,
+  "processing_time_ms": 8234
+}
+```
+
+**Common Issues:**
+- Container not running: Check whisper-server on port 9102
+- Model not downloaded: First run downloads model (2-3 min)
+- File too large: 100MB limit per file
+
+**Note:** Replace old Whisper workflow (curl) with this MCP tool for cleaner integration.
+
 ---
 
 ## Complete Workflows
@@ -400,20 +449,21 @@ mcp__anythingllm__chat_with_workspace
 mcp__yt-dlp__ytdlp_download_audio
   url: "https://www.youtube.com/watch?v=VIDEO_ID"
 
-# 2. Transcribe with Whisper
-TRANSCRIPTION=$(curl -s -X POST http://localhost:9102/transcribe \
-  -F "audio=@$HOME/Downloads/video-title.m4a" \
-  -F "language=auto" \
-  -F "model=base")
+# 2. Transcribe with Whisper MCP
+mcp__tapiocapioca_whisper-mcp-server__transcribe_audio
+  file_path: "~/Downloads/video-title.m4a"
+  language: "auto"
+  model: "base"
 
-TEXT=$(echo "$TRANSCRIPTION" | jq -r '.text')
+# 3. Extract text from JSON response
+TEXT=$(echo "$RESPONSE" | jq -r '.text')
 
-# 3. Embed transcript
+# 4. Embed transcript
 mcp__anythingllm__embed_text
   slug: "brainery"
   texts: ["$TEXT"]
 
-# 4. Query
+# 5. Query
 mcp__anythingllm__chat_with_workspace
   slug: "brainery"
   message: "What are the key takeaways?"
@@ -423,14 +473,14 @@ mcp__anythingllm__chat_with_workspace
 ### Workflow 4: Local Audio File
 
 ```
-# 1. Transcribe
-curl -X POST http://localhost:9102/transcribe \
-  -F "audio=@/path/to/audio.mp3" \
-  -F "language=auto" \
-  -F "model=base" > /tmp/transcription.json
+# 1. Transcribe with Whisper MCP
+mcp__tapiocapioca_whisper-mcp-server__transcribe_audio
+  file_path: "/path/to/audio.mp3"
+  language: "auto"
+  model: "base"
 
-# 2. Extract text
-TEXT=$(cat /tmp/transcription.json | jq -r '.text')
+# 2. Extract text from JSON response
+TEXT=$(echo "$RESPONSE" | jq -r '.text')
 
 # 3. Embed
 mcp__anythingllm__embed_text
