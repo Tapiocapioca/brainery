@@ -126,7 +126,62 @@ Claude will use Crawl4AI to extract text and embed it.
 
 ---
 
-## Example 5: Create Topic-Specific Workspace
+## Example 5: Local Audio File Import
+
+**Scenario:** Transcribe and import a podcast episode or meeting recording from your local machine.
+
+### Step 1: Prepare audio file
+
+Ensure your audio file is in a supported format (MP3, WAV, M4A, OGG, FLAC, WEBM).
+
+### Step 2: Transcribe with Whisper
+
+```
+Transcribe this local audio file: /home/user/podcasts/episode-123.mp3
+```
+
+Claude will:
+
+1. **Call Whisper server**:
+   ```bash
+   curl -X POST http://localhost:9102/transcribe \
+     -F "audio=@/home/user/podcasts/episode-123.mp3" \
+     -F "language=auto" \
+     -F "model=base"
+   ```
+
+2. **Extract transcript** from JSON response
+
+3. **Embed into AnythingLLM**:
+   ```
+   mcp__anythingllm__embed_text
+     slug: "brainery"
+     texts: ["<transcription text>"]
+   ```
+
+### Step 3: Query the content
+
+```
+What are the key topics discussed in the podcast episode I just imported?
+```
+
+**Result:** Claude retrieves the transcript and summarizes the main discussion points.
+
+### Tips
+
+- **For long files (>30 minutes)**: Use `model=tiny` for faster processing, then re-transcribe important sections with `model=base` or `model=small`
+- **Language detection**: Use `language=auto` if unsure, or specify explicitly (`en`, `it`, `zh`)
+- **File path**: Use absolute paths (e.g., `/home/user/file.mp3`) or relative to Claude Code's working directory
+
+**Common use cases:**
+- Podcast episodes for research
+- Meeting recordings for note-taking
+- Interview transcripts for analysis
+- Voice memos for personal knowledge base
+
+---
+
+## Example 6: Create Topic-Specific Workspace
 
 **Scenario:** Organize content by topic using separate workspaces.
 
@@ -165,7 +220,7 @@ Query the machine-learning workspace: What are the key concepts in ML?
 
 ---
 
-## Example 6: Advanced Content Filtering
+## Example 7: Advanced Content Filtering
 
 **Scenario:** Extract only relevant sections from a long article.
 
@@ -203,7 +258,7 @@ mcp__crawl4ai__md
 
 ---
 
-## Example 7: Verify Import Success
+## Example 8: Verify Import Success
 
 **Scenario:** Ensure content was successfully embedded before proceeding.
 
@@ -222,7 +277,7 @@ Claude will:
 
 ---
 
-## Example 8: Multi-Language Content
+## Example 9: Multi-Language Content
 
 **Scenario:** Import content in different languages (English, Italian, Chinese).
 
@@ -250,7 +305,7 @@ What are the common themes in all three articles? (Answer in English)
 
 ---
 
-## Example 9: Delete Old Content
+## Example 10: Delete Old Content
 
 **Scenario:** Remove outdated content from workspace.
 
@@ -279,7 +334,7 @@ mcp__anythingllm__delete_document
 
 ---
 
-## Example 10: Troubleshooting Failed Import
+## Example 11: Troubleshooting Failed Import
 
 **Scenario:** Import fails due to connection issue.
 

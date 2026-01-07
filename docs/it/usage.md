@@ -126,7 +126,62 @@ Claude utilizzerà Crawl4AI per estrarre il testo e incorporarlo.
 
 ---
 
-## Esempio 5: Creare Workspace Specifico per Argomento
+## Esempio 5: Importazione File Audio Locale
+
+**Scenario:** Trascrivere e importare un episodio di podcast o una registrazione di una riunione dalla tua macchina locale.
+
+### Passo 1: Preparare il file audio
+
+Assicurati che il tuo file audio sia in un formato supportato (MP3, WAV, M4A, OGG, FLAC, WEBM).
+
+### Passo 2: Trascrivere con Whisper
+
+```
+Trascrivi questo file audio locale: /home/user/podcasts/episodio-123.mp3
+```
+
+Claude eseguirà:
+
+1. **Chiamata al server Whisper**:
+   ```bash
+   curl -X POST http://localhost:9102/transcribe \
+     -F "audio=@/home/user/podcasts/episodio-123.mp3" \
+     -F "language=auto" \
+     -F "model=base"
+   ```
+
+2. **Estrazione della trascrizione** dalla risposta JSON
+
+3. **Embed in AnythingLLM**:
+   ```
+   mcp__anythingllm__embed_text
+     slug: "brainery"
+     texts: ["<testo trascrizione>"]
+   ```
+
+### Passo 3: Interrogare il contenuto
+
+```
+Quali sono i temi chiave discussi nell'episodio del podcast che ho appena importato?
+```
+
+**Risultato:** Claude recupera la trascrizione e riassume i punti principali della discussione.
+
+### Suggerimenti
+
+- **Per file lunghi (>30 minuti)**: Usa `model=tiny` per un'elaborazione più veloce, poi ri-trascrivi le sezioni importanti con `model=base` o `model=small`
+- **Rilevamento lingua**: Usa `language=auto` se non sei sicuro, oppure specifica esplicitamente (`en`, `it`, `zh`)
+- **Percorso file**: Usa percorsi assoluti (es. `/home/user/file.mp3`) o relativi alla directory di lavoro di Claude Code
+
+**Casi d'uso comuni:**
+- Episodi di podcast per ricerca
+- Registrazioni di riunioni per prendere appunti
+- Trascrizioni di interviste per analisi
+- Memo vocali per knowledge base personale
+
+---
+
+## Esempio 6: Creare Workspace Specifico per Argomento
 
 **Scenario:** Organizzare contenuti per argomento usando workspace separati.
 
@@ -203,7 +258,7 @@ mcp__crawl4ai__md
 
 ---
 
-## Esempio 7: Verificare Successo Importazione
+## Esempio 8: Verificare Successo Importazione
 
 **Scenario:** Assicurarsi che il contenuto sia stato incorporato correttamente prima di procedere.
 

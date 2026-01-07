@@ -102,8 +102,49 @@ mcp__anythingllm__embed_webpage
 ```
 
 **Note:** Local PDF files require conversion to text first using `pdftotext` (part of poppler-utils).
+### 4. Local Audio File Import
 
-### 4. Query RAG Database
+For local audio files (MP3, WAV, M4A, OGG, FLAC, etc), use Whisper directly:
+
+**Step 1: Transcribe local audio**
+
+```bash
+curl -X POST http://localhost:9102/transcribe \n  -F "audio=@/path/to/audio/file.mp3" \n  -F "language=auto" \n  -F "model=base"
+```
+
+**Supported audio formats:**
+- MP3, M4A, WAV, OGG, FLAC, WEBM
+- Any format supported by ffmpeg
+
+**Step 2: Extract and embed transcript**
+
+```bash
+# Save transcription to variable
+TRANSCRIPTION=$(curl -s -X POST http://localhost:9102/transcribe \n  -F "audio=@/path/to/audio/file.mp3" \n  -F "language=auto" \n  -F "model=base")
+
+# Extract text field
+TEXT=$(echo "$TRANSCRIPTION" | jq -r '.text')
+
+# Embed into RAG
+mcp__anythingllm__embed_text
+  slug: "brainery"
+  texts: ["$TEXT"]
+```
+
+**Common use cases:**
+- Podcast episodes (MP3)
+- Interview recordings (WAV)
+- Voice memos (M4A)
+- Meeting recordings (any format)
+
+**Tips:**
+- Use `language=auto` if unsure of audio language
+- Use `model=base` for good balance of speed/quality
+- For long files (>30 min), consider using `model=tiny` first to test
+- Check file path is absolute or relative to current directory
+
+
+### 5. Query RAG Database
 
 Always use `mode: "query"` to search documents:
 
