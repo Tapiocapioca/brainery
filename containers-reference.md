@@ -9,14 +9,14 @@ Complete infrastructure reference for Docker containers, troubleshooting, and sy
 │ Claude Code │
 └──────┬──────┘
        │ MCP Tools
-       ├────────┬────────┬────────┐
-       ▼        ▼        ▼        ▼
-  ┌─────────┐┌───────┐┌────────┐┌──────────┐
-  │crawl4ai ││yt-dlp ││whisper ││anythingllm│
-  │  :9100  ││ :9101 ││ :9102  ││  :9103    │
-  └─────────┘└───────┘└────────┘└──────────┘
-   Web scrape YouTube  Audio     RAG DB
-               transc.  transc.
+       ├────────┬────────┬────────┬────────┐
+       ▼        ▼        ▼        ▼        ▼
+  ┌─────────┐┌───────┐┌────────┐┌──────────┐┌────────────┐
+  │crawl4ai ││yt-dlp ││whisper ││anythingllm││unstructured│
+  │  :9100  ││ :9101 ││ :9102  ││  :9103    ││   :9104    │
+  └─────────┘└───────┘└────────┘└──────────┘└────────────┘
+   Web scrape YouTube  Audio     RAG DB      Document
+               transc.  transc.              parsing
 ```
 
 ## Container Specifications
@@ -57,20 +57,29 @@ Complete infrastructure reference for Docker containers, troubleshooting, and sy
 - **Volume:** `anythingllm-storage` (persistent)
 - **Health:** `http://localhost:9103/api/ping`
 
+### unstructured-api
+- **Image:** `tapiocapioca/unstructured-api:latest`
+- **Container:** `brainery-unstructured-api-1`
+- **Port:** 9104 (configurable: `UNSTRUCTURED_PORT`)
+- **Internal:** 8000
+- **Purpose:** Local document parsing (PDF, DOCX, TXT, logs)
+- **Volume:** None (uses HTTP API)
+- **Health:** `http://localhost:9104/health`
+
 ## System Requirements
 
 ### Minimum
 - **Docker Desktop:** 20.10+
-- **RAM:** 8GB minimum
-- **Disk:** ~13GB
-  - Container images: ~6GB
+- **RAM:** 12GB minimum
+- **Disk:** ~20GB
+  - Container images: ~10GB
   - Whisper models: ~3GB
-  - Data volumes: ~4GB
+  - Data volumes: ~7GB
 - **OS:** Windows 10/11 (WSL 2), macOS 10.15+, Linux (kernel 3.10+)
 
 ### Recommended
-- **RAM:** 12GB
-- **Disk:** ~20GB (with buffer for data growth)
+- **RAM:** 16GB
+- **Disk:** ~25GB (with buffer for data growth)
 - **CPU:** 4+ cores (for Whisper performance)
 
 ### Breakdown
@@ -81,8 +90,9 @@ Complete infrastructure reference for Docker containers, troubleshooting, and sy
 | yt-dlp-server | ~1GB | ~256MB |
 | whisper-server | ~3GB | ~2GB |
 | anythingllm | ~1GB | ~1GB |
+| unstructured-api | ~3GB | ~2GB |
 | Data volumes | ~6GB | - |
-| **TOTAL** | **~13GB** | **~4GB** |
+| **TOTAL** | **~17GB** | **~6GB** |
 
 ## Installation
 
