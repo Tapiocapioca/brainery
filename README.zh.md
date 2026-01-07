@@ -12,6 +12,7 @@ Brainery 使 Claude Code 能够使用 AnythingLLM 作为本地 RAG（检索增�
 - 🌐 **网页抓取** 与干净的 markdown 提取（Crawl4AI）
 - 📺 **YouTube 转录** 自动回退到音频转录（yt-dlp + Whisper）
 - 📄 **PDF 导入** 带文本提取
+- 📁 **本地文档解析**（PDF、DOCX、TXT、日志）通过 unstructured-mcp-server
 - 🧠 **本地 RAG 数据库** 用于私有、离线内容查询（AnythingLLM）
 - 🐳 **基于 Docker** 的基础设施，带预构建镜像
 - 💰 **免费 LLM 提供商** 兼容 AnythingLLM（iFlow Platform - 免费套餐含 200K 上下文令牌）
@@ -57,7 +58,12 @@ npx -y @smithery/cli install @tapiocapioca/anythingllm-mcp-server --client claud
 
 # 安装其他 MCP 服务器
 npx -y @smithery/cli install crawl4ai --client claude
+
+# 安装本地文档解析器
+pip install unstructured-mcp-server
 npx -y @smithery/cli install yt-dlp --client claude
+\n# 安装本地文档解析器
+pip install unstructured-mcp-server
 ```
 
 > **📝 注意：** 我们使用自定义 fork 的 AnythingLLM MCP 服务器：https://github.com/Tapiocapioca/anythingllm-mcp-server
@@ -124,7 +130,7 @@ git clone https://github.com/Tapiocapioca/brainery.git
 
 ## 架构
 
-Brainery 使用模块化架构，包含 4 个 Docker 容器：
+Brainery 使用模块化架构，包含 5 个 Docker 容器：
 
 ```
 ┌─────────────┐
@@ -146,12 +152,12 @@ Brainery 使用模块化架构，包含 4 个 Docker 容器：
 
 - **Docker Desktop** 20.10+
 - **Docker Compose** 2.0+
-- **最低 8GB 内存**（推荐 12GB）
-- **约 13GB 磁盘空间** 用于容器和模型
+- **最低 12GB 内存**（推荐 12GB）
+- **约 20GB 磁盘空间** 用于容器和模型
 
 ## 端口配置
 
-默认端口（9100-9103）开箱即用。要自定义，创建 `.env` 文件：
+默认端口（9100-9104）开箱即用。要自定义，创建 `.env` 文件：
 
 ```bash
 cd brainery-containers
