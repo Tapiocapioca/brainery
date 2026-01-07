@@ -129,7 +129,58 @@ API Key: 你的-api-密钥
 Workspace: brainery
 ```
 
-## 步骤 4：安装 Brainery 技能
+## 步骤 4：安装 MCP 服务器
+
+MCP（模型上下文协议）服务器使 Claude Code 能够与 Docker 容器交互。安装所需的服务器：
+
+### 安装 AnythingLLM MCP 服务器（自定义 Fork）
+
+我们使用具有附加功能的自定义 fork：
+
+```bash
+npx -y @smithery/cli install @tapiocapioca/anythingllm-mcp-server --client claude
+```
+
+**为什么使用自定义 fork？**
+- 我们的 fork：https://github.com/Tapiocapioca/anythingllm-mcp-server
+- 基于：https://github.com/Lifeforge-app/anythingllm-mcp-server
+- 包含 Brainery 工作流的修复和增强
+
+### 安装其他 MCP 服务器
+
+```bash
+# Crawl4AI 服务器
+npx -y @smithery/cli install crawl4ai --client claude
+
+# yt-dlp 服务器
+npx -y @smithery/cli install yt-dlp --client claude
+```
+
+### 验证 MCP 安装
+
+在 Claude Code 中检查已安装的 MCP 服务器：
+
+```bash
+cat ~/.claude/config.json
+```
+
+查找类似的条目：
+```json
+{
+  "mcpServers": {
+    "anythingllm-mcp-server": { ... },
+    "crawl4ai": { ... },
+    "yt-dlp": { ... }
+  }
+}
+```
+
+**MCP 安装故障排除：**
+- 如果 `@smithery/cli` 失败，手动安装：`npm install -g @smithery/cli`
+- 安装 MCP 服务器后重启 Claude Code
+- 检查 MCP 服务器日志：`~/.claude/logs/mcp-*.log`
+
+## 步骤 5：安装 Brainery 技能
 
 ### 选项 A：手动安装
 
@@ -150,7 +201,7 @@ git clone https://github.com/Tapiocapioca/brainery.git
 /install-skill https://github.com/Tapiocapioca/brainery
 ```
 
-## 步骤 5：验证安装
+## 步骤 6：验证安装
 
 在 Claude Code 中测试完整工作流：
 

@@ -129,7 +129,58 @@ API Key: your-api-key-here
 Workspace: brainery
 ```
 
-## Step 4: Install Brainery Skill
+## Step 4: Install MCP Servers
+
+MCP (Model Context Protocol) servers enable Claude Code to interact with the Docker containers. Install the required servers:
+
+### Install AnythingLLM MCP Server (Custom Fork)
+
+We use a custom fork with additional features:
+
+```bash
+npx -y @smithery/cli install @tapiocapioca/anythingllm-mcp-server --client claude
+```
+
+**Why a custom fork?**
+- Our fork: https://github.com/Tapiocapioca/anythingllm-mcp-server
+- Based on: https://github.com/Lifeforge-app/anythingllm-mcp-server
+- Includes fixes and enhancements for Brainery workflow
+
+### Install Other MCP Servers
+
+```bash
+# Crawl4AI server
+npx -y @smithery/cli install crawl4ai --client claude
+
+# yt-dlp server
+npx -y @smithery/cli install yt-dlp --client claude
+```
+
+### Verify MCP Installation
+
+Check installed MCP servers in Claude Code:
+
+```bash
+cat ~/.claude/config.json
+```
+
+Look for entries like:
+```json
+{
+  "mcpServers": {
+    "anythingllm-mcp-server": { ... },
+    "crawl4ai": { ... },
+    "yt-dlp": { ... }
+  }
+}
+```
+
+**Troubleshooting MCP Installation:**
+- If `@smithery/cli` fails, install manually: `npm install -g @smithery/cli`
+- Restart Claude Code after installing MCP servers
+- Check MCP server logs: `~/.claude/logs/mcp-*.log`
+
+## Step 5: Install Brainery Skill
 
 ### Option A: Manual Installation
 
@@ -150,7 +201,7 @@ In Claude Code, run:
 /install-skill https://github.com/Tapiocapioca/brainery
 ```
 
-## Step 5: Verify Installation
+## Step 6: Verify Installation
 
 Test the complete workflow in Claude Code:
 

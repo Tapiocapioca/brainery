@@ -13,6 +13,7 @@ Brainery consente a Claude Code di importare e interrogare contenuti web utilizz
 - 📺 **Trascrizioni YouTube** con fallback automatico alla trascrizione audio (yt-dlp + Whisper)
 - 📄 **Importazione PDF** con estrazione testo
 - 🧠 **Database RAG locale** per interrogazione di contenuti privati offline (AnythingLLM)
+- 💰 **Provider LLM gratuito** compatibile con AnythingLLM (iFlow Platform - tier gratuito con 200K token di contesto)
 - 🐳 **Infrastruttura Docker** con immagini pre-costruite
 - 🌍 **Documentazione multilingua** (EN/IT/ZH)
 
@@ -36,11 +37,32 @@ docker-compose up -d
 
 Apri http://localhost:9103 e:
 1. Crea account admin
-2. Configura provider LLM (consigliato: iFlow Platform con modello glm-4.6)
+2. **Configura provider LLM** (consigliato: **iFlow Platform** - tier gratuito con 200K token di contesto)
+   - Provider: `OpenAI Compatible`
+   - Base URL: `https://vibex.iflow.cn/v1`
+   - Model: `glm-4.6`
+   - Ottieni API key da: https://iflow.cn
 3. Crea workspace (es. "brainery")
 4. Genera chiave API in Impostazioni → Chiavi API
 
-### 3. Installare Skill
+> **💡 Perché iFlow?** Tier gratuito con eccellente supporto multilingua (EN/IT/ZH), finestra di contesto 200K e tempi di risposta veloci. Vedi [Guida Installazione](docs/it/installation.md#configurazione-iflow-platform-consigliato) per setup dettagliato.
+
+### 3. Installare Server MCP
+
+Installa i server MCP richiesti per l'integrazione con Claude Code:
+
+```bash
+# Installa server MCP AnythingLLM (usa il nostro fork)
+npx -y @smithery/cli install @tapiocapioca/anythingllm-mcp-server --client claude
+
+# Installa altri server MCP
+npx -y @smithery/cli install crawl4ai --client claude
+npx -y @smithery/cli install yt-dlp --client claude
+```
+
+> **📝 Nota:** Usiamo un fork personalizzato del server MCP AnythingLLM: https://github.com/Tapiocapioca/anythingllm-mcp-server
+
+### 4. Installare Skill
 
 ```bash
 cd ~/.claude/skills
@@ -49,7 +71,7 @@ git clone https://github.com/Tapiocapioca/brainery.git
 
 Riavvia Claude Code per caricare la skill.
 
-### 4. Testare Importazione
+### 5. Testare Importazione
 
 In Claude Code:
 

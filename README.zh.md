@@ -14,6 +14,7 @@ Brainery 使 Claude Code 能够使用 AnythingLLM 作为本地 RAG（检索增�
 - 📄 **PDF 导入** 带文本提取
 - 🧠 **本地 RAG 数据库** 用于私有、离线内容查询（AnythingLLM）
 - 🐳 **基于 Docker** 的基础设施，带预构建镜像
+- 💰 **免费 LLM 提供商** 兼容 AnythingLLM（iFlow Platform - 免费套餐含 200K 上下文令牌）
 - 🌍 **多语言** 文档（EN/IT/ZH）
 
 ## 快速开始
@@ -36,11 +37,32 @@ docker-compose up -d
 
 打开 http://localhost:9103 并：
 1. 创建管理员账户
-2. 配置 LLM 提供商（推荐：iFlow Platform 与 glm-4.6 模型）
+2. **配置 LLM 提供商**（推荐：**iFlow Platform** - 免费套餐含 200K 上下文令牌）
+   - 提供商：`OpenAI Compatible`
+   - Base URL：`https://vibex.iflow.cn/v1`
+   - 模型：`glm-4.6`
+   - 获取 API 密钥：https://iflow.cn
 3. 创建工作区（例如 "brainery"）
 4. 在设置 → API 密钥中生成 API 密钥
 
-### 3. 安装技能
+> **💡 为什么选择 iFlow？** 免费套餐提供出色的多语言支持（EN/IT/ZH）、200K 上下文窗口和快速响应时间。查看[安装指南](docs/zh/installation.md#iflow-platform-设置推荐)了解详细设置。
+
+### 3. 安装 MCP 服务器
+
+为 Claude Code 集成安装所需的 MCP 服务器：
+
+```bash
+# 安装 AnythingLLM MCP 服务器（使用我们的 fork）
+npx -y @smithery/cli install @tapiocapioca/anythingllm-mcp-server --client claude
+
+# 安装其他 MCP 服务器
+npx -y @smithery/cli install crawl4ai --client claude
+npx -y @smithery/cli install yt-dlp --client claude
+```
+
+> **📝 注意：** 我们使用自定义 fork 的 AnythingLLM MCP 服务器：https://github.com/Tapiocapioca/anythingllm-mcp-server
+
+### 4. 安装技能
 
 ```bash
 cd ~/.claude/skills
@@ -49,7 +71,7 @@ git clone https://github.com/Tapiocapioca/brainery.git
 
 重启 Claude Code 以加载技能。
 
-### 4. 测试导入
+### 5. 测试导入
 
 在 Claude Code 中：
 

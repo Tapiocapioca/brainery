@@ -13,6 +13,7 @@ Brainery enables Claude Code to import and query web content using AnythingLLM a
 - 📺 **YouTube transcripts** with automatic fallback to audio transcription (yt-dlp + Whisper)
 - 📄 **PDF import** with text extraction
 - 🧠 **Local RAG database** for private, offline content querying (AnythingLLM)
+- 💰 **Free LLM provider** compatible with AnythingLLM (iFlow Platform - 200K context tokens free tier)
 - 🐳 **Docker-based** infrastructure with pre-built images
 - 🌍 **Multilingual** documentation (EN/IT/ZH)
 
@@ -36,11 +37,32 @@ docker-compose up -d
 
 Open http://localhost:9103 and:
 1. Create admin account
-2. Configure LLM provider (recommended: iFlow Platform with glm-4.6 model)
+2. **Configure LLM provider** (recommended: **iFlow Platform** - free tier with 200K context tokens)
+   - Provider: `OpenAI Compatible`
+   - Base URL: `https://vibex.iflow.cn/v1`
+   - Model: `glm-4.6`
+   - Get API key from: https://iflow.cn
 3. Create workspace (e.g., "brainery")
 4. Generate API key in Settings → API Keys
 
-### 3. Install Skill
+> **💡 Why iFlow?** Free tier with excellent multilingual support (EN/IT/ZH), 200K context window, and fast response times. See [Installation Guide](docs/en/installation.md#iflow-platform-setup-recommended) for detailed setup.
+
+### 3. Install MCP Servers
+
+Install required MCP servers for Claude Code integration:
+
+```bash
+# Install AnythingLLM MCP server (use our fork)
+npx -y @smithery/cli install @tapiocapioca/anythingllm-mcp-server --client claude
+
+# Install other MCP servers
+npx -y @smithery/cli install crawl4ai --client claude
+npx -y @smithery/cli install yt-dlp --client claude
+```
+
+> **📝 Note:** We use a custom fork of AnythingLLM MCP server: https://github.com/Tapiocapioca/anythingllm-mcp-server
+
+### 4. Install Skill
 
 ```bash
 cd ~/.claude/skills
@@ -49,7 +71,7 @@ git clone https://github.com/Tapiocapioca/brainery.git
 
 Restart Claude Code to load the skill.
 
-### 4. Test Import
+### 5. Test Import
 
 In Claude Code:
 
