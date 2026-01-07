@@ -12,6 +12,7 @@ Brainery enables Claude Code to import and query web content using AnythingLLM a
 - 🌐 **Web scraping** with clean markdown extraction (Crawl4AI)
 - 📺 **YouTube transcripts** with automatic fallback to audio transcription (yt-dlp + Whisper)
 - 📄 **PDF import** with text extraction
+- 📁 **Local document parsing** (PDF, DOCX, TXT, logs) via unstructured-mcp-server
 - 🧠 **Local RAG database** for private, offline content querying (AnythingLLM)
 - 💰 **Free LLM provider** compatible with AnythingLLM (iFlow Platform - 200K context tokens free tier)
 - 🐳 **Docker-based** infrastructure with pre-built images
@@ -58,6 +59,8 @@ npx -y @smithery/cli install @tapiocapioca/anythingllm-mcp-server --client claud
 # Install other MCP servers
 npx -y @smithery/cli install crawl4ai --client claude
 npx -y @smithery/cli install yt-dlp --client claude
+\n# Install local document parser
+pip install unstructured-mcp-server
 ```
 
 > **📝 Note:** We use a custom fork of AnythingLLM MCP server: https://github.com/Tapiocapioca/anythingllm-mcp-server
@@ -124,7 +127,7 @@ What are the key concepts discussed in all the articles I imported today?
 
 ## Architecture
 
-Brainery uses a modular architecture with 4 Docker containers:
+Brainery uses a modular architecture with 5 Docker containers:
 
 ```
 ┌─────────────┐
@@ -146,12 +149,12 @@ Brainery uses a modular architecture with 4 Docker containers:
 
 - **Docker Desktop** 20.10+
 - **Docker Compose** 2.0+
-- **8GB RAM minimum** (12GB recommended)
-- **~13GB disk space** for containers and models
+- **12GB RAM minimum** (16GB recommended)
+- **~20GB disk space** for containers and models
 
 ## Port Configuration
 
-Default ports (9100-9103) work out-of-box. To customize, create `.env` file:
+Default ports (9100-9104) work out-of-box. To customize, create `.env` file:
 
 ```bash
 cd brainery-containers
