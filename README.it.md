@@ -12,6 +12,7 @@ Brainery consente a Claude Code di importare e interrogare contenuti web utilizz
 - 🌐 **Web scraping** con estrazione markdown pulita (Crawl4AI)
 - 📺 **Trascrizioni YouTube** con fallback automatico alla trascrizione audio (yt-dlp + Whisper)
 - 📄 **Importazione PDF** con estrazione testo
+- 📁 **Parsing documenti locali** (PDF, DOCX, TXT, log) via unstructured-mcp-server
 - 🧠 **Database RAG locale** per interrogazione di contenuti privati offline (AnythingLLM)
 - 💰 **Provider LLM gratuito** compatibile con AnythingLLM (iFlow Platform - tier gratuito con 200K token di contesto)
 - 🐳 **Infrastruttura Docker** con immagini pre-costruite
@@ -57,7 +58,12 @@ npx -y @smithery/cli install @tapiocapioca/anythingllm-mcp-server --client claud
 
 # Installa altri server MCP
 npx -y @smithery/cli install crawl4ai --client claude
+
+# Installa parser documenti locali
+pip install unstructured-mcp-server
 npx -y @smithery/cli install yt-dlp --client claude
+\n# Installa parser documenti locali
+pip install unstructured-mcp-server
 ```
 
 > **📝 Nota:** Usiamo un fork personalizzato del server MCP AnythingLLM: https://github.com/Tapiocapioca/anythingllm-mcp-server
@@ -124,7 +130,7 @@ Quali sono i concetti chiave discussi in tutti gli articoli che ho importato ogg
 
 ## Architettura
 
-Brainery usa un'architettura modulare con 4 container Docker:
+Brainery usa un'architettura modulare con 5 container Docker:
 
 ```
 ┌─────────────┐
@@ -146,12 +152,12 @@ Brainery usa un'architettura modulare con 4 container Docker:
 
 - **Docker Desktop** 20.10+
 - **Docker Compose** 2.0+
-- **8GB RAM minimo** (12GB consigliati)
-- **~13GB spazio disco** per container e modelli
+- **12GB RAM minimo** (16GB consigliati)
+- **~20GB spazio disco** per container e modelli
 
 ## Configurazione Porte
 
-Le porte predefinite (9100-9103) funzionano out-of-box. Per personalizzare, crea file `.env`:
+Le porte predefinite (9100-9104) funzionano out-of-box. Per personalizzare, crea file `.env`:
 
 ```bash
 cd brainery-containers
