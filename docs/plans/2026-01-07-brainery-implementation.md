@@ -12,37 +12,7 @@
 
 ## PHASE 1: Docker Infrastructure (brainery-containers repo)
 
-### Task 1: Fork Unstructured-IO/unstructured-api
-
-**Files:**
-- None (GitHub web operation)
-
-**Step 1: Fork on GitHub**
-
-1. Navigate to: https://github.com/Unstructured-IO/unstructured-api
-2. Click "Fork" button
-3. Set owner: `Tapiocapioca`
-4. Repository name: `unstructured-api`
-5. Description: "Fork of Unstructured.io API for Brainery integration"
-6. Create fork
-
-**Step 2: Verify fork**
-
-Run: `gh repo view Tapiocapioca/unstructured-api`
-Expected: Repository details displayed
-
-**Step 3: Clone locally (optional)**
-
-```bash
-cd C:/AI/Skills/BRAINERY
-git clone https://github.com/Tapiocapioca/unstructured-api.git
-```
-
-Expected: Repository cloned successfully
-
----
-
-### Task 2: Create Dockerfile for unstructured-api
+### Task 1: Create Dockerfile for unstructured-api
 
 **Files:**
 - Create: `dockerfiles/unstructured-api/Dockerfile`
@@ -87,7 +57,7 @@ Based on official unstructured.io Docker image."
 
 ---
 
-### Task 3: Update docker-compose.yml
+### Task 2: Update docker-compose.yml
 
 **Files:**
 - Modify: `docker-compose.yml`
@@ -142,7 +112,7 @@ Add 5th container for local document parsing:
 
 ---
 
-### Task 4: Update .env.example
+### Task 3: Update .env.example
 
 **Files:**
 - Modify: `.env.example`
@@ -176,7 +146,7 @@ Add configuration for unstructured-api container:
 
 ---
 
-### Task 5: Update GitHub Actions workflow
+### Task 4: Update GitHub Actions workflow
 
 **Files:**
 - Modify: `.github/workflows/build-and-push.yml`
@@ -216,7 +186,7 @@ Docker image builds and pushes to Docker Hub."
 
 ---
 
-### Task 6: Test container stack locally
+### Task 5: Test container stack locally
 
 **Files:**
 - None (testing only)
@@ -274,7 +244,7 @@ docker-compose down
 
 ---
 
-### Task 7: Push changes and trigger GitHub Actions
+### Task 6: Push changes and trigger GitHub Actions
 
 **Files:**
 - None (git operation)
