@@ -10,6 +10,7 @@ Complete reference for MCP tools used in Brainery workflows.
 | **yt-dlp-server** | 9101 | YouTube transcripts | `mcp__yt-dlp__*` |
 | **whisper-server** | 9102 | Audio transcription | HTTP API (curl) |
 | **anythingllm** | 9103 | Local RAG database | `mcp__anythingllm__*` |
+| **unstructured-api** | 9104 | Document parsing | `mcp__tapiocapioca_unstructured-mcp-server__*` |
 
 ---
 
@@ -259,6 +260,97 @@ mcp__anythingllm__list_workspaces
 
 ---
 
+## Unstructured Tools (FastMCP)
+
+### parse_document
+
+Parse local documents (PDF, DOCX, TXT, logs) and extract text.
+
+**Tool name:** `mcp__tapiocapioca_unstructured-mcp-server__parse_document`
+
+**Parameters:**
+- `file_path` (required): Absolute path to file on host machine
+- `strategy` (optional): Parsing strategy
+  - `auto`: Automatic detection (default)
+  - `fast`: Fast parsing
+  - `hi_res`: High resolution OCR
+  - `ocr_only`: OCR only mode
+
+**Supported formats:**
+- **Documents:** PDF, DOCX, PPTX, XLSX, EML, HTML
+- **Text files:** .txt, .log, .md, .csv, .json, .yaml, .py, .js, .conf (direct read, no API call)
+
+**Example:**
+```
+mcp__tapiocapioca_unstructured-mcp-server__parse_document
+  file_path: "C:/Users/Name/Documents/report.pdf"
+  strategy: "auto"
+```
+
+**Returns JSON:**
+```json
+{
+  "text": "Extracted text content...",
+  "elements_count": 42,
+  "file_type": "application/pdf",
+  "pages": 5,
+  "processing_time_ms": 1234
+}
+```
+
+**Common Issues:**
+- File not found: Use absolute paths, not relative
+- API not reachable: Check unstructured-api container running on port 9104
+- File too large: 50MB limit per file
+
+### parse_batch
+
+Parse multiple documents in batch.
+
+**Tool name:** `mcp__tapiocapioca_unstructured-mcp-server__parse_batch`
+
+**Parameters:**
+- `file_paths` (required): Array of absolute paths to files
+
+**Example:**
+```
+mcp__tapiocapioca_unstructured-mcp-server__parse_batch
+  file_paths: [
+    "C:/Documents/report1.pdf",
+    "C:/Documents/report2.docx",
+    "C:/Documents/notes.txt"
+  ]
+```
+
+**Returns JSON array:**
+```json
+[
+  {
+    "file": "C:/Documents/report1.pdf",
+    "success": true,
+    "text": "...",
+    "elements_count": 42,
+    "processing_time_ms": 1234
+  },
+  {
+    "file": "C:/Documents/report2.docx",
+    "success": true,
+    "text": "...",
+    "elements_count": 18,
+    "processing_time_ms": 892
+  },
+  {
+    "file": "C:/Documents/notes.txt",
+    "success": true,
+    "text": "...",
+    "elements_count": 1,
+    "processing_time_ms": 5
+  }
+]
+```
+
+---
+
 ## Complete Workflows
 
 ### Workflow 1: Web Page Import
@@ -352,6 +444,29 @@ mcp__anythingllm__chat_with_workspace
   mode: "query"
 ```
 
+
+### Workflow 5: Local Document Import
+
+```
+# 1. Parse document
+mcp__tapiocapioca_unstructured-mcp-server__parse_document
+  file_path: "C:/Users/Name/Documents/research.pdf"
+  strategy: "auto"
+
+# 2. Extract text from JSON response
+TEXT=$(echo "$RESPONSE" | jq -r '.text')
+
+# 3. Embed into RAG
+mcp__anythingllm__embed_text
+  slug: "brainery"
+  texts: ["$TEXT"]
+
+# 4. Query
+mcp__anythingllm__chat_with_workspace
+  slug: "brainery"
+  message: "What are the key findings in the research paper?"
+  mode: "query"
+```
 ---
 
 ## Error Handling
