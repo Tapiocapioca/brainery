@@ -12,7 +12,7 @@ Brainery uses 4 Docker containers working together:
 |-----------|------|---------|-----------------|
 | **crawl4ai** | 9100 | Clean text extraction from web pages | `mcp__crawl4ai__*` |
 | **yt-dlp-server** | 9101 | YouTube transcript extraction | `mcp__yt-dlp__*` |
-| **whisper-server** | 9102 | Audio transcription (fallback) | N/A (used internally) |
+| **whisper-server** | 9102 | Audio transcription (fallback) | HTTP API (curl) |
 | **anythingllm** | 9103 | Local RAG database | `mcp__anythingllm__*` |
 
 ## Prerequisites
@@ -139,13 +139,86 @@ cd <brainery-containers-path>
 docker-compose restart <service-name>
 ```
 
-### No Transcript Available
+### No Transcript Available (Whisper Integration)
 
-If YouTube video has no transcript, use Whisper for audio transcription:
+If YouTube video has no transcript, use Whisper for audio transcription.
 
-1. Download audio: `mcp__yt-dlp__ytdlp_download_audio`
-2. Transcribe with Whisper (manually via curl to port 9102)
-3. Embed result with `mcp__anythingllm__embed_text`
+**Full Workflow:**
+
+**Step 1: Download audio**
+```
+mcp__yt-dlp__ytdlp_download_audio
+  url: "https://www.youtube.com/watch?v=VIDEO_ID"
+```
+
+This downloads audio to `~/Downloads/` by default. Note the downloaded filename.
+
+**Step 2: Transcribe with Whisper**
+
+Use the whisper-server container (port 9102) via Bash:
+
+```bash
+curl -X POST http://localhost:9102/transcribe \
+  -F "audio=@$HOME/Downloads/downloaded-audio-file.m4a" \
+  -F "language=en" \
+  -F "model=base"
+```
+
+**Whisper API Parameters:**
+- `audio`: Path to audio file (required)
+- `language`: Language code (`en`, `it`, `zh`, `auto` for auto-detect)
+- `model`: Model size - `tiny`, `base`, `small`, `medium`, `large`
+  - `tiny`: Fastest, lowest quality (~39M params)
+  - `base`: Fast, good quality (~74M params) **← Recommended**
+  - `small`: Balanced (~244M params)
+  - `medium`: High quality, slower (~769M params)
+  - `large`: Best quality, slowest (~1550M params)
+
+**Example response:**
+```json
+{
+  "text": "This is the transcribed text...",
+  "language": "en",
+  "duration": 125.5,
+  "segments": [...]
+}
+```
+
+**Step 3: Embed transcript**
+
+Extract the `text` field from Whisper response and embed:
+
+```
+mcp__anythingllm__embed_text
+  slug: "brainery"
+  texts: ["<transcription text from Whisper>"]
+```
+
+**Complete Example:**
+
+```bash
+# 1. Download audio
+mcp__yt-dlp__ytdlp_download_audio
+  url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+# 2. Transcribe (assuming downloaded as "video-title.m4a")
+TRANSCRIPTION=$(curl -s -X POST http://localhost:9102/transcribe \
+  -F "audio=@$HOME/Downloads/video-title.m4a" \
+  -F "language=auto" \
+  -F "model=base")
+
+# 3. Extract text field and embed
+echo "$TRANSCRIPTION" | jq -r '.text' > /tmp/transcript.txt
+
+mcp__anythingllm__embed_text
+  slug: "brainery"
+  texts: ["$(cat /tmp/transcript.txt)"]
+```
+
+**Troubleshooting Whisper:**
+- If model download is slow, use `tiny` or `base` model first
+- Check whisper-server logs: `docker logs brainery-whisper-server-1`
+- Ensure audio format is supported (m4a, mp3, wav, ogg, flac, webm)
 
 ## Best Practices
 
@@ -162,6 +235,11 @@ If YouTube video has no transcript, use Whisper for audio transcription:
 4. **Clean URLs**: Remove tracking parameters before importing
 
 5. **Verify Embeddings**: After embedding, test with a simple query to ensure content is accessible
+
+6. **Whisper Model Selection**:
+   - Use `base` for most cases (good balance)
+   - Use `tiny` for long videos to save time
+   - Use `small` or `medium` for critical transcriptions
 
 ## Troubleshooting
 
