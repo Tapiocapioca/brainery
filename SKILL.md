@@ -31,6 +31,7 @@ Import web content into local RAG (AnythingLLM) for natural language queries. Co
 | YouTube (no subs) | yt-dlp audio → whisper → embed_text | In RAG |
 | Local audio | whisper → embed_text | In RAG |
 | PDF URL | crawl4ai → embed_webpage | In RAG |
+| Local document | unstructured parse → embed_text | In RAG |
 
 ## Core Pattern
 
